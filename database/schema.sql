@@ -1,6 +1,6 @@
 CREATE DATABASE `eshop`;
 
-CREATE TABLE `eshop`.`customers` (
+CREATE TABLE `eshop`.`customer` (
   `name` VARCHAR(32) NOT NULL,
   `address` VARCHAR(128) NOT NULL,
   `email` VARCHAR(128) NULL,
