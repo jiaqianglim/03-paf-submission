@@ -8,10 +8,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import vttp2022.paf.assessment.eshop.models.Order;
 import vttp2022.paf.assessment.eshop.models.OrderStatus;
@@ -24,7 +27,7 @@ public class OrderRepository {
 	private JdbcTemplate temp;
 
 	@Transactional
-	public boolean add(Order o) {
+	public boolean add(Order o) throws DataAccessException {
 		List<Object[]> params = o.getLineItems().stream()
 				.map(li -> new Object[] { li.getItem(), li.getQuantity(), o.getOrderId() })
 				.collect(Collectors.toList());

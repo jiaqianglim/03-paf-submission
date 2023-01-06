@@ -36,7 +36,8 @@ public class OrderStatus {
 
 	public static JsonObject createJsonFromOrderStatus(OrderStatus os) {
 		if (os.getStatus().equals("dispatched")) {
-			return Json.createObjectBuilder().add("orderId", os.getOrderId()).add("deliveryId", os.getDeliveryId())
+			return Json.createObjectBuilder().add("orderId", os.getOrderId())
+					.add("deliveryId", os.getDeliveryId())
 					.add("status", "dispatched").build();
 		}
 		return Json.createObjectBuilder().add("orderId", os.getOrderId()).add("status", "pending").build();
