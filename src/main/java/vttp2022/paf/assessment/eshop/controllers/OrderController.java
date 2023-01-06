@@ -66,8 +66,6 @@ public class OrderController {
 				.map(o -> LineItem.toLineItemFromJson(o)).toList();
 		Order newOrder = new Order();
 		newOrder.setOrderId(UUID.randomUUID().toString().substring(0, 8));
-		// generate order id
-		newOrder.setDeliveryId("");
 		newOrder.setName(name);
 		newOrder.setAddress(customer.getAddress());
 		newOrder.setEmail(customer.getEmail());
@@ -79,6 +77,8 @@ public class OrderController {
 		// Order saved to database
 		OrderStatus status = wsvc.dispatch(newOrder);
 		// Order saved to warehouse
+		orepo.add(status);
+		// Order send to order_status
 		return ResponseEntity.ok(OrderStatus.createJsonFromOrderStatus(status).toString());
 
 	}
@@ -95,7 +95,8 @@ public class OrderController {
 			return ResponseEntity.ok(Json.createObjectBuilder()
 					.add("name", name)
 					.add("dispatched", result.get().get("dispatched"))
-					.add("pending", result.get().get("pending")).build().toString());
+					.add("pending", result.get().get("pending"))
+					.build().toString());
 		return ResponseEntity.status(404).body("Internal Server Error");
 	}
 }

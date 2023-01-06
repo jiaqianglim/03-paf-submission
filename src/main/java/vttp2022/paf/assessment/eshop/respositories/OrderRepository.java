@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import vttp2022.paf.assessment.eshop.models.Order;
+import vttp2022.paf.assessment.eshop.models.OrderStatus;
 
 @Repository
 public class OrderRepository {
@@ -23,7 +24,7 @@ public class OrderRepository {
 	private JdbcTemplate temp;
 
 	@Transactional
-	public boolean add(Order o){
+	public boolean add(Order o) {
 		List<Object[]> params = o.getLineItems().stream()
 				.map(li -> new Object[] { li.getItem(), li.getQuantity(), o.getOrderId() })
 				.collect(Collectors.toList());
@@ -39,7 +40,7 @@ public class OrderRepository {
 	public Optional<Map<String, Integer>> getStatusByName(String name) {
 		Map<String, Integer> result = new LinkedHashMap<>();
 		SqlRowSet rs = temp.queryForRowSet(
-				"select status, count(status) as _count from order_status as os join order as o on os.delivery_id = o.delivery_id_where o.name = '?'group by status;",
+				"select status, count(status) as _count from order_status as os join order as o on os.order_id = o.order_id_where o.name = '?' group by status;",
 				name);
 		if (rs.next()) {
 			result.put(rs.getString("status"), rs.getInt("_count"));
@@ -47,6 +48,20 @@ public class OrderRepository {
 		if (result.size() > 0)
 			return Optional.of(result);
 		return Optional.empty();
+	}
+
+	public boolean add(OrderStatus os) {
+		int addedOrderStatus = 0;
+		if (os.getStatus().equals("dispatched")) {
+			addedOrderStatus = temp.update(
+					"insert into eshop.order_status(order_id, delivery_id, status) values(?,?,?)",
+					os.getOrderId(), os.getDeliveryId(), "dispatched");
+		}
+		if (os.getStatus().equals("pending")) {
+			addedOrderStatus = temp.update("insert into eshop.order_status(order_id, status) values(?,?)",
+					os.getOrderId(), "pending");
+		}
+		return addedOrderStatus > 0;
 	}
 
 }

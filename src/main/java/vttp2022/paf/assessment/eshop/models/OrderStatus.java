@@ -39,6 +39,6 @@ public class OrderStatus {
 			return Json.createObjectBuilder().add("orderId", os.getOrderId()).add("deliveryId", os.getDeliveryId())
 					.add("status", "dispatched").build();
 		}
-		return Json.createObjectBuilder().add("orderId", os.getOrderId()).add("status", "Pending").build();
+		return Json.createObjectBuilder().add("orderId", os.getOrderId()).add("status", "pending").build();
 	}
 }

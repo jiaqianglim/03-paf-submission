@@ -38,16 +38,15 @@ public class WarehouseService {
 		RestTemplate rt = new RestTemplate();
 		ResponseEntity<String> resp = rt.exchange(req, String.class);
 		OrderStatus os = new OrderStatus();
+		os.setOrderId(order.getOrderId());
 		JsonObject body;
 		try (InputStream is = new ByteArrayInputStream(resp.getBody().getBytes())) {
 			JsonReader jr = Json.createReader(is);
 			body = jr.readObject();
-			os.setDeliveryId(body.getString("orderId"));
 			os.setDeliveryId(body.getString("deliveryId"));
 			os.setStatus("dispatched");
 			return os;
 		} catch (Exception e) {
-			os.setOrderId(order.getOrderId());
 			os.setStatus("pending");
 			return os;
 		}
