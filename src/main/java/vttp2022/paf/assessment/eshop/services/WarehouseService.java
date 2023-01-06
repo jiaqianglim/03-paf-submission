@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.json.Json;
@@ -16,6 +17,7 @@ import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
 import vttp2022.paf.assessment.eshop.models.OrderStatus;
 
+@Service
 public class WarehouseService {
 
 	// You cannot change the method's signature
@@ -30,25 +32,25 @@ public class WarehouseService {
 				.add("name", order.getName()).add("address", order.getCustomer().getAddress())
 				.add("email", order.getEmail()).add("lineItems", lineItems)
 				.add("createdBy", "Lim Jia Qiang").build();
-		RequestEntity<String> req = RequestEntity.post("http://paf.chuklee/dispatch").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).body(requestPayload.toString());
+		RequestEntity<String> req = RequestEntity.post("http://paf.chuklee/dispatch")
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				.body(requestPayload.toString());
 		RestTemplate rt = new RestTemplate();
 		ResponseEntity<String> resp = rt.exchange(req, String.class);
 		OrderStatus os = new OrderStatus();
 		JsonObject body;
-		try (InputStream is = new ByteArrayInputStream(resp.getBody().getBytes())){
+		try (InputStream is = new ByteArrayInputStream(resp.getBody().getBytes())) {
 			JsonReader jr = Json.createReader(is);
 			body = jr.readObject();
 			os.setDeliveryId(body.getString("orderId"));
 			os.setDeliveryId(body.getString("deliveryId"));
 			os.setStatus("dispatched");
 			return os;
-		}catch(Exception e){
+		} catch (Exception e) {
 			os.setOrderId(order.getOrderId());
 			os.setStatus("pending");
 			return os;
 		}
-
-
 
 		// TODO: Task 4
 

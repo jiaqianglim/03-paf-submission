@@ -19,7 +19,7 @@ public class CustomerRepository {
 	public Optional<Customer> findCustomerByName(String name) {
 		// TODO: Task 3
 		Customer c = new Customer();
-		SqlRowSet rs = temp.queryForRowSet("SELECT * FROM ESHOP.CUSTOMERS WHERE NAME = '?'", name);
+		SqlRowSet rs = temp.queryForRowSet("SELECT * FROM eshop.customers WHERE NAME = '?'", name);
 		if (rs.next()) {
 			c.setName(rs.getString("name"));
 			c.setAddress(rs.getString("address"));

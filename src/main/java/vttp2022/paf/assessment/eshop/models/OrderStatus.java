@@ -2,7 +2,6 @@ package vttp2022.paf.assessment.eshop.models;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
 
 // DO NOT CHANGE THIS CLASS
 public class OrderStatus {

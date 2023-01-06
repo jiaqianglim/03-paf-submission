@@ -3,8 +3,10 @@ package vttp2022.paf.assessment.eshop.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,25 +67,35 @@ public class OrderController {
 		Order newOrder = new Order();
 		newOrder.setOrderId(UUID.randomUUID().toString().substring(0, 8));
 		// generate order id
-		newOrder.setDeliveryId(UUID.randomUUID().toString().substring(0, 8));
+		newOrder.setDeliveryId("");
 		newOrder.setName(name);
 		newOrder.setAddress(customer.getAddress());
 		newOrder.setEmail(customer.getEmail());
 		newOrder.setStatus("pending");
 		newOrder.setLineItems(lineitemlist);
+		Boolean success = orepo.add(newOrder);
+		if (!success)
+			return returnError("Failed to add order");
+		// Order saved to database
 		OrderStatus status = wsvc.dispatch(newOrder);
+		// Order saved to warehouse
 		return ResponseEntity.ok(OrderStatus.createJsonFromOrderStatus(status).toString());
 
 	}
 
 	private ResponseEntity<String> returnError(String errorMsg) {
 		JsonObject o = Json.createObjectBuilder().add("error", errorMsg).build();
-		return ResponseEntity.status(404).body(o.toString());
+		return ResponseEntity.internalServerError().body(o.toString());
 	}
 
 	@GetMapping("/{name}/status")
 	public ResponseEntity<String> getOrdersByCustomer(@PathVariable String name) {
-		// todo
-		return ResponseEntity.ok("null");
+		Optional<Map<String, Integer>> result = orepo.getStatusByName(name);
+		if (result.isPresent())
+			return ResponseEntity.ok(Json.createObjectBuilder()
+					.add("name", name)
+					.add("dispatched", result.get().get("dispatched"))
+					.add("pending", result.get().get("pending")).build().toString());
+		return ResponseEntity.status(404).body("Internal Server Error");
 	}
 }
